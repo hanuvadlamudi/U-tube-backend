@@ -5,6 +5,7 @@ import { loginUser } from "../controllers/user.controllers.js";
 import { logoutUser } from "../controllers/user.controllers.js";
 import { verifyjwt } from "../middleware/auth.middleware.js";
 import { refreshAccessToken } from "../controllers/user.controllers.js";
+import { changePassword } from "../controllers/user.controllers.js";
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.route("/login").post(loginUser)
 //secure routes
 router.route("/logout").post(verifyjwt,logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
+router.route("/change-password").post(verifyjwt,changePassword)
 
 export default router;                      
