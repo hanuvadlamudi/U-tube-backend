@@ -223,11 +223,68 @@ const changePassword = asyncHandler( async(req,res) => {
 })
 
 
+const getCurrentUser = asyncHandler( async(req,res) => {
+  return res
+  .status(200)
+  .json(new ApiResponse(200,req.user,"details of Current User"))
+})
+
+const updateAccountDetails = asyncHandler( async(req,res) => {
+
+  const {userName,email} = req.body;
+
+  if(!(userName && email)){
+    throw new ApiError(400,"All fields are requireed");
+  }
+
+  const user = await User.findByIdAndUpdate(req.user?._id,{
+    $set : {
+      userName,
+      email
+    },
+  },
+  {new:true}).select("-password  -refreshToken")
+
+  return res
+  .status(200)
+  .json( new ApiResponse(200,user,"Details updated Successfully"))
+})
+
+
+const updateAvatar = asyncHandler(async (req,res) => {
+  const avatarLocalPath = req.file?.path
+
+  if(!avatarLocalPath){
+    throw new ApiError(400,"Avatar file is missing")
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if(!avatar.url){
+    throw new ApiError(400,"Error in file uploading in cloudinary");
+  }
+
+  const user = await User.findByIdAndUpdate(req.user?._id,{
+    $set : {
+      avatar : avatar.url
+    }
+  },
+  {new : true}.select("-password  -resfreshToken"))
+
+  return res
+  .status(200)
+  .json(200,user,"Avatar image updated Successfully");
+})
+
+
 
 export { 
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
-  changePassword
+  changePassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateAvatar
 };
